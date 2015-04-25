@@ -10,7 +10,8 @@
 
     <color name="primary">#00bcd4</color>
     <color name="primaryDark">#0097a7</color>
-    <color name="accent">#FF4081</color>
+    <!-- <color name="accent">#FF4081</color> -->
+    <color name="accent">#FFC400</color>
     <color name="drawerBackground">#FFF</color>
     <color name="windowBackground">#FFF</color>
     <color name="textPrimaryColor">#212121</color>
