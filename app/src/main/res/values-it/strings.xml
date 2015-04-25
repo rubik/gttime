@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Gttime</string>
+    <string name="action_settings">Impostazioni</string>
+    <string name="drawer_close">Drawer aperto</string>
+    <string name="drawer_open">Drawer chiuso</string>
+    <string name="drawer_text_starred">Fermate preferite</string>
+    <string name="stop">Fermata</string>
+    <string name="text_no_stop">Nessuna fermata selezionata</string>
+    <string name="toast_no_conn">Nessuna connesione ad internet</string>
+    <string name="toast_no_data">Nessuna informazione disponibile</string>
+    <string name="toast_no_stop">Inserire la fermata</string>
+</resources>
