@@ -7,6 +7,8 @@
 
     <string name="stop">Stop Number</string>
     <string name="text_no_stop">No stop selected.</string>
+    <string name="text_starred">Starred stops</string>
+    <string name="text_no_starred">No starred stops</string>
     <string name="toast_no_conn">Internet connection is not available</string>
     <string name="toast_no_data">No data available</string>
     <string name="toast_no_stop">Insert a stop number</string>

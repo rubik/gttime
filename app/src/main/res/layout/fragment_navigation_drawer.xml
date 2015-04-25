@@ -7,12 +7,24 @@
         android:id="@+id/drawer_text_starred"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textAppearance="?android:attr/textAppearanceLarge"
         android:textStyle="bold"
         android:padding="8dp"
         android:layout_marginTop="5dp"
         android:layout_marginStart="10dp"
-        android:text="Starred stops" />
+        android:text="@string/text_starred" />
+
+    <TextView
+        android:id="@+id/drawer_text_no_starred"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/drawer_text_starred"
+        android:padding="8dp"
+        android:text="@string/text_no_starred"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="10dp"
+        android:visibility="gone" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/drawer_list"
@@ -21,5 +33,6 @@
         android:layout_below="@id/drawer_text_starred"
         android:layout_marginTop="10dp"
         android:clickable="true"
-        android:scrollbars="vertical" />
+        android:scrollbars="vertical"
+        android:visibility="visible" />
 </RelativeLayout>

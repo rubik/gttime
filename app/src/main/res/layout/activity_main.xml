@@ -32,7 +32,7 @@
                     android:layout_marginTop="5dp"
                     android:layout_marginBottom="36dp"
                     card_view:cardCornerRadius="4dp"
-                    card_view:cardElevation="4dp" >
+                    card_view:cardElevation="4dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -70,6 +70,7 @@
                     android:layout_alignBottom="@id/stop_card"
                     android:layout_marginBottom="-28dp"
                     android:layout_marginEnd="8dp"
+                    android:onClick="refreshDataFromView"
                     materialdesign:iconDrawable="@drawable/ic_search_white" />
 
                 <include

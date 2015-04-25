@@ -9,6 +9,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckedTextView;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -59,12 +60,6 @@ public class MainActivity extends ActionBarActivity
         ButtonFloat mButtonFloat = (ButtonFloat) findViewById(R.id.fab_search);
         mButtonFloat.setBackgroundColor(getResources().getColor(R.color.primary));
         mButtonFloat.setRippleColor(getResources().getColor(R.color.primaryDark));
-        mButtonFloat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                refreshData();
-            }
-        });
 
         mStopEdit = (EditText) findViewById(R.id.stop_edit);
         mResultNoStop = (TextView) findViewById(R.id.result_no_stop);
@@ -73,11 +68,11 @@ public class MainActivity extends ActionBarActivity
         mResults = (RelativeLayout) findViewById(R.id.results);
 
         mNavigationDrawerFragment = (NavigationDrawerFragment)
-                getFragmentManager().findFragmentById(R.id.fragment_drawer);
+                getSupportFragmentManager().findFragmentById(R.id.fragment_drawer);
         mNavigationDrawerFragment.setup(R.id.fragment_drawer,
                 (DrawerLayout) findViewById(R.id.drawer), mToolbar);
 
-        mDataset = new ArrayList<StopResult>();
+        mDataset = new ArrayList<>();
         mRecyclerView = (RecyclerView) findViewById(R.id.results_recycler_view);
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -100,6 +95,20 @@ public class MainActivity extends ActionBarActivity
             mNavigationDrawerFragment.closeDrawer();
         else
             super.onBackPressed();
+    }
+
+    public void modifyFavorites(View v) {
+        CheckedTextView star = (CheckedTextView) v;
+        star.toggle();
+        if (star.isChecked()) {
+            Toast.makeText(getApplicationContext(), "Adding stop to starred", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getApplicationContext(), "Removing stop to starred", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void refreshDataFromView(View v) {
+        refreshData();
     }
 
     private void refreshData() {

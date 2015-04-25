@@ -10,4 +10,6 @@
     <string name="toast_no_conn">Nessuna connesione ad internet</string>
     <string name="toast_no_data">Nessuna informazione disponibile</string>
     <string name="toast_no_stop">Inserire la fermata</string>
+    <string name="text_no_starred">Nessuna fermata</string>
+    <string name="text_starred">Preferiti</string>
 </resources>

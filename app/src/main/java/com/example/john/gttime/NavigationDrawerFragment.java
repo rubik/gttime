@@ -1,11 +1,11 @@
 package com.example.john.gttime;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,8 +14,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -37,6 +41,11 @@ public class NavigationDrawerFragment extends Fragment implements NavigationDraw
     private static final String PREF_USER_LEARNED_DRAWER = "navigation_drawer_learned";
 
     /**
+     * All the starred stops.
+     */
+    private static final String KEY_STARRED_STOPS = "key_starred_stop";
+
+    /**
      * A pointer to the current callbacks instance (the Activity).
      */
     private NavigationDrawerCallbacks mCallbacks;
@@ -45,6 +54,7 @@ public class NavigationDrawerFragment extends Fragment implements NavigationDraw
      * Helper component that ties the action bar to the navigation drawer.
      */
     private ActionBarDrawerToggle mActionBarDrawerToggle;
+    private SharedPreferences mSharedPrefs;
 
     private DrawerLayout mDrawerLayout;
     private RecyclerView mDrawerList;
@@ -61,6 +71,7 @@ public class NavigationDrawerFragment extends Fragment implements NavigationDraw
         // Read in the flag indicating whether or not the user has demonstrated awareness of the
         // drawer. See PREF_USER_LEARNED_DRAWER for details.
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        mSharedPrefs = sp;
         mUserLearnedDrawer = sp.getBoolean(PREF_USER_LEARNED_DRAWER, false);
 
         if (savedInstanceState != null) {
@@ -78,8 +89,15 @@ public class NavigationDrawerFragment extends Fragment implements NavigationDraw
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mDrawerList.setLayoutManager(layoutManager);
         mDrawerList.setHasFixedSize(true);
+        TextView mTextNoStarred = (TextView) view.findViewById(R.id.drawer_text_no_starred);
 
         final List<NavigationItem> navigationItems = getMenu();
+        if (navigationItems.isEmpty()) {
+            mDrawerList.setVisibility(View.GONE);
+            mTextNoStarred.setVisibility(View.VISIBLE);
+            return view;
+        }
+        mTextNoStarred.setVisibility(View.GONE);
         NavigationDrawerAdapter adapter = new NavigationDrawerAdapter(navigationItems);
         adapter.setNavigationDrawerCallbacks(this);
         mDrawerList.setAdapter(adapter);
@@ -106,12 +124,23 @@ public class NavigationDrawerFragment extends Fragment implements NavigationDraw
 
     public List<NavigationItem> getMenu() {
         List<NavigationItem> items = new ArrayList<>();
-        items.add(new NavigationItem("item 1",
-                getResources().getDrawable(R.drawable.ic_menu_check, getActivity().getTheme())));
-        items.add(new NavigationItem("item 2",
-                getResources().getDrawable(R.drawable.ic_menu_check, getActivity().getTheme())));
-        items.add(new NavigationItem("item 3",
-                getResources().getDrawable(R.drawable.ic_menu_check, getActivity().getTheme())));
+//        items.add(new NavigationItem("item 1",
+//                getResources().getDrawable(R.drawable.ic_menu_check, getActivity().getTheme())));
+//        items.add(new NavigationItem("item 2",
+//                getResources().getDrawable(R.drawable.ic_menu_check, getActivity().getTheme())));
+//        items.add(new NavigationItem("item 3",
+//                getResources().getDrawable(R.drawable.ic_menu_check, getActivity().getTheme())));
+        List<String> starred = new ArrayList<>(mSharedPrefs.getStringSet(KEY_STARRED_STOPS, new HashSet<String>()));
+        Collections.sort(starred, new Comparator<String>() {
+            public int compare(String first, String second) {
+                Integer a = Integer.parseInt(first);
+                Integer b = Integer.parseInt(second);
+                return a > b ? -1 : (a.equals(b) ? 0 : -1);
+            }
+        });
+        if (starred.isEmpty()) {
+            return items;
+        }
         return items;
     }
 
