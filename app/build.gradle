@@ -5,7 +5,7 @@ android {
     buildToolsVersion "22.0.1"
 
     defaultConfig {
-        applicationId "com.example.john.navdraw"
+        applicationId "com.example.john.gttime"
         minSdkVersion 21
         targetSdkVersion 22
         versionCode 1
