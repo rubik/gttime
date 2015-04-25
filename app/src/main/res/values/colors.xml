@@ -16,7 +16,7 @@
     <color name="windowBackground">#FFF</color>
     <color name="textPrimaryColor">#212121</color>
     <color name="navigationColor">#000</color>
-    <color name="colorHighlight">#3F51B5</color>
+    <color name="highlight">#3F51B5</color>
 
     <drawable name="pressed_gray">#0c000000</drawable>
     <drawable name="selected_gray">#2c000000</drawable>

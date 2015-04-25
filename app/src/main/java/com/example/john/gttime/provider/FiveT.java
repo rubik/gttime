@@ -4,7 +4,6 @@ package com.example.john.gttime.provider;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
-
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.example.john.gttime.model.ApiResult;
@@ -24,13 +23,13 @@ public class FiveT {
     private static final String BASE_URL = "http://www.5t.torino.it/5t/trasporto/arrival-times-byline.jsp?action=getTransitsByLine&shortName=";
 
     public static void getStopData(final String stopNumber, RequestQueue rq, final StopDataClientListener listener) {
-        final ArrayList<StopResult> stopResults = new ArrayList<StopResult>();
+        final ArrayList<StopResult> stopResults = new ArrayList<>();
         final ApiResult result = new ApiResult(stopResults);
         String url = makeUrl(stopNumber);
         StringRequest req = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String s) {
-                parseResponse(stopNumber, s, result);
+                parseResponse(s, result);
                 listener.onResponse(result);
             }
         }, new Response.ErrorListener() {
@@ -42,7 +41,7 @@ public class FiveT {
         rq.add(req);
     }
 
-    private static void parseResponse(String stopNumber, String response, ApiResult result) {
+    private static void parseResponse(String response, ApiResult result) {
         try {
             Document doc = Jsoup.parse(response);
             result.setStopName(doc.select("#infow span").first().text());

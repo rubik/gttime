@@ -50,8 +50,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         CardView v = (CardView) LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.result_item, parent, false);
-        ViewHolder vh = new ViewHolder(v);
-        return vh;
+        return new ViewHolder(v);
     }
 
     @Override
@@ -66,17 +65,18 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         );
         holder.mTransportNumber.setText(element.getTransportNumber());
         StringBuilder times = new StringBuilder();
-        ArrayList<Integer> positions = new ArrayList<Integer>();
+        ArrayList<Integer> positions = new ArrayList<>();
         int i = 0;
         for (StopTime time : element.getTimes()) {
-            times.append(time.toString() + " ");
+            times.append(time.toString());
+            times.append(" ");
             if (time.isRealTime()) positions.add(i++);
         }
         String completeSring = times.toString();
         Spannable timesToSpan = new SpannableString(completeSring.substring(0, completeSring.length() - 1));
         for (int pos : positions) {
             timesToSpan.setSpan(new ForegroundColorSpan(
-                            mContext.getResources().getColor(R.color.colorHighlight)), pos * 6, pos * 6 + 5,
+                            mContext.getResources().getColor(R.color.highlight)), pos * 6, pos * 6 + 5,
                     Spannable.SPAN_INCLUSIVE_INCLUSIVE
             );
         }
