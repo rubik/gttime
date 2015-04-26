@@ -230,8 +230,11 @@ public class NavigationDrawerFragment extends Fragment implements NavigationDraw
         return mStarred.contains(stopNumber);
     }
 
-    public void openDrawer() {
-        mDrawerLayout.openDrawer(mFragmentContainerView);
+    public void clearStarred() {
+        mStarred.clear();
+        SharedPreferences.Editor editor = mSharedPrefs.edit();
+        editor.putStringSet(KEY_STARRED_STOPS, new HashSet<String>());
+        editor.commit();
     }
 
     public void closeDrawer() {

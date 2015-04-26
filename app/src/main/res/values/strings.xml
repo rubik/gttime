@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">Gttime</string>
+    <string name="action_clear">Clear favorites</string>
     <string name="drawer_text_starred">Starred stops</string>
     <string name="drawer_open">Menu opened</string>
     <string name="drawer_close">Menu closed</string>
-    <string name="action_settings">Settings</string>
 
     <string name="stop">Stop Number</string>
     <string name="text_no_stop">No stop selected.</string>

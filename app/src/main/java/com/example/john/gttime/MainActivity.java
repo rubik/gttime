@@ -34,7 +34,6 @@ public class MainActivity extends ActionBarActivity
         implements NavigationDrawerCallbacks {
 
     private NavigationDrawerFragment mNavigationDrawerFragment;
-    private Toolbar mToolbar;
 
     private RequestQueue mRequestQueue;
     private EditText mStopEdit;
@@ -43,24 +42,23 @@ public class MainActivity extends ActionBarActivity
     private ProgressBarCircularIndeterminate mProgressCircle;
     private RelativeLayout mResults;
 
-    private String mStopNumber = null;
+    private String mStopNumber;
     private ArrayList<StopResult> mDataset;
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mToolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
-        setSupportActionBar(mToolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_actionbar);
+        setSupportActionBar(toolbar);
 
         mRequestQueue = Volley.newRequestQueue(getApplicationContext());
 
-        ButtonFloat mButtonFloat = (ButtonFloat) findViewById(R.id.fab_search);
-        mButtonFloat.setBackgroundColor(getResources().getColor(R.color.primary));
-        mButtonFloat.setRippleColor(getResources().getColor(R.color.primaryDark));
+        ButtonFloat buttonFloat = (ButtonFloat) findViewById(R.id.fab_search);
+        buttonFloat.setBackgroundColor(getResources().getColor(R.color.primary));
+        buttonFloat.setRippleColor(getResources().getColor(R.color.primaryDark));
 
         mStopEdit = (EditText) findViewById(R.id.stop_edit);
         mResultNoStop = (TextView) findViewById(R.id.result_no_stop);
@@ -71,12 +69,12 @@ public class MainActivity extends ActionBarActivity
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.fragment_drawer);
         mNavigationDrawerFragment.setup(R.id.fragment_drawer,
-                (DrawerLayout) findViewById(R.id.drawer), mToolbar);
+                (DrawerLayout) findViewById(R.id.drawer), toolbar);
 
         mDataset = new ArrayList<>();
         mRecyclerView = (RecyclerView) findViewById(R.id.results_recycler_view);
-        mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(layoutManager);
         mAdapter = new RecyclerViewAdapter(mDataset, getApplicationContext());
         mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setItemAnimator(new SlideInRightAnimator());
@@ -176,8 +174,12 @@ public class MainActivity extends ActionBarActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_clear) {
+            mNavigationDrawerFragment.clearStarred();
+            mNavigationDrawerFragment.datasetChanged();
+            if (mStopName != null) {
+                mStopName.setChecked(false);
+            }
         }
         return super.onOptionsItemSelected(item);
     }
