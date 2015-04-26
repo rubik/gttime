@@ -17,10 +17,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -28,6 +28,11 @@ import java.util.List;
  * design guidelines</a> for a complete explanation of the behaviors implemented here.
  */
 public class NavigationDrawerFragment extends Fragment implements NavigationDrawerCallbacks {
+
+    /**
+     * All the starred stops.
+     */
+    public static final String KEY_STARRED_STOPS = "key_starred_stop";
 
     /**
      * Remember the position of the selected item.
@@ -40,10 +45,6 @@ public class NavigationDrawerFragment extends Fragment implements NavigationDraw
      */
     private static final String PREF_USER_LEARNED_DRAWER = "navigation_drawer_learned";
 
-    /**
-     * All the starred stops.
-     */
-    private static final String KEY_STARRED_STOPS = "key_starred_stop";
 
     /**
      * A pointer to the current callbacks instance (the Activity).
@@ -58,11 +59,21 @@ public class NavigationDrawerFragment extends Fragment implements NavigationDraw
 
     private DrawerLayout mDrawerLayout;
     private RecyclerView mDrawerList;
+    private NavigationDrawerAdapter mNavigationDrawerAdapter;
     private View mFragmentContainerView;
+    private TextView mTextNoStarred;
 
     private int mCurrentSelectedPosition = 0;
     private boolean mFromSavedInstanceState;
     private boolean mUserLearnedDrawer;
+    private TreeSet<String> mStarred = new TreeSet<>(new Comparator<String>() {
+        public int compare(String first, String second) {
+            Integer a = Integer.parseInt(first);
+            Integer b = Integer.parseInt(second);
+            return a > b ? 1 : (a.equals(b) ? 0 : -1);
+        }
+    });
+    private final ArrayList<NavigationItem> mNavigationItems = new ArrayList<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -78,70 +89,34 @@ public class NavigationDrawerFragment extends Fragment implements NavigationDraw
             mCurrentSelectedPosition = savedInstanceState.getInt(STATE_SELECTED_POSITION);
             mFromSavedInstanceState = true;
         }
+
+        mStarred.addAll(getStarredFromPrefs());
+    }
+
+    public TreeSet<String> getStarred() {
+        return mStarred;
+    }
+
+    public Set<String> getStarredFromPrefs() {
+        return mSharedPrefs.getStringSet(KEY_STARRED_STOPS, new HashSet<String>());
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
+        mTextNoStarred = (TextView) view.findViewById(R.id.drawer_text_no_starred);
+
         mDrawerList = (RecyclerView) view.findViewById(R.id.drawer_list);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mDrawerList.setLayoutManager(layoutManager);
         mDrawerList.setHasFixedSize(true);
-        TextView mTextNoStarred = (TextView) view.findViewById(R.id.drawer_text_no_starred);
-
-        final List<NavigationItem> navigationItems = getMenu();
-        if (navigationItems.isEmpty()) {
-            mDrawerList.setVisibility(View.GONE);
-            mTextNoStarred.setVisibility(View.VISIBLE);
-            return view;
-        }
-        mTextNoStarred.setVisibility(View.GONE);
-        NavigationDrawerAdapter adapter = new NavigationDrawerAdapter(navigationItems);
-        adapter.setNavigationDrawerCallbacks(this);
-        mDrawerList.setAdapter(adapter);
-        selectItem(mCurrentSelectedPosition);
+        mNavigationDrawerAdapter = new NavigationDrawerAdapter(mNavigationItems);
+        mNavigationDrawerAdapter.setNavigationDrawerCallbacks(this);
+        mDrawerList.setAdapter(mNavigationDrawerAdapter);
+        datasetChanged();
         return view;
-    }
-
-    public boolean isDrawerOpen() {
-        return mDrawerLayout != null && mDrawerLayout.isDrawerOpen(mFragmentContainerView);
-    }
-
-    public ActionBarDrawerToggle getActionBarDrawerToggle() {
-        return mActionBarDrawerToggle;
-    }
-
-    public DrawerLayout getDrawerLayout() {
-        return mDrawerLayout;
-    }
-
-    @Override
-    public void onNavigationDrawerItemSelected(int position) {
-        selectItem(position);
-    }
-
-    public List<NavigationItem> getMenu() {
-        List<NavigationItem> items = new ArrayList<>();
-//        items.add(new NavigationItem("item 1",
-//                getResources().getDrawable(R.drawable.ic_menu_check, getActivity().getTheme())));
-//        items.add(new NavigationItem("item 2",
-//                getResources().getDrawable(R.drawable.ic_menu_check, getActivity().getTheme())));
-//        items.add(new NavigationItem("item 3",
-//                getResources().getDrawable(R.drawable.ic_menu_check, getActivity().getTheme())));
-        List<String> starred = new ArrayList<>(mSharedPrefs.getStringSet(KEY_STARRED_STOPS, new HashSet<String>()));
-        Collections.sort(starred, new Comparator<String>() {
-            public int compare(String first, String second) {
-                Integer a = Integer.parseInt(first);
-                Integer b = Integer.parseInt(second);
-                return a > b ? -1 : (a.equals(b) ? 0 : -1);
-            }
-        });
-        if (starred.isEmpty()) {
-            return items;
-        }
-        return items;
     }
 
     /**
@@ -197,6 +172,65 @@ public class NavigationDrawerFragment extends Fragment implements NavigationDraw
         mDrawerLayout.setDrawerListener(mActionBarDrawerToggle);
     }
 
+    public void datasetChanged() {
+        getMenu();
+        if (mNavigationItems.isEmpty()) {
+            mDrawerList.setVisibility(View.GONE);
+            mTextNoStarred.setVisibility(View.VISIBLE);
+        }
+        mTextNoStarred.setVisibility(View.GONE);
+        mNavigationDrawerAdapter.notifyDataSetChanged();
+        //selectItem(mCurrentSelectedPosition);
+    }
+
+    public boolean isDrawerOpen() {
+        return mDrawerLayout != null && mDrawerLayout.isDrawerOpen(mFragmentContainerView);
+    }
+
+    public ActionBarDrawerToggle getActionBarDrawerToggle() {
+        return mActionBarDrawerToggle;
+    }
+
+    public DrawerLayout getDrawerLayout() {
+        return mDrawerLayout;
+    }
+
+    @Override
+    public void onNavigationDrawerItemSelected(int position) {
+        selectItem(position);
+    }
+
+    public void getMenu() {
+        mNavigationItems.clear();
+        mStarred.clear();
+        mStarred.addAll(getStarredFromPrefs());
+        if (mStarred.isEmpty()) {
+            return;
+        }
+        for (String stopNumber : mStarred) {
+            mNavigationItems.add(new NavigationItem(stopNumber,
+                    getResources().getDrawable(R.drawable.ic_label_grey, getActivity().getTheme())));
+        }
+    }
+
+    public void addToFavorites(String stopNumber) {
+        SharedPreferences.Editor editor = mSharedPrefs.edit();
+        mStarred.add(stopNumber);
+        editor.putStringSet(KEY_STARRED_STOPS, new HashSet<>(mStarred));
+        editor.commit();
+    }
+
+    public void removeFromFavorites(String stopNumber) {
+        SharedPreferences.Editor editor = mSharedPrefs.edit();
+        mStarred.remove(stopNumber);
+        editor.putStringSet(KEY_STARRED_STOPS, new HashSet<>(mStarred));
+        editor.commit();
+    }
+
+    public Boolean isFavorite(String stopNumber) {
+        return mStarred.contains(stopNumber);
+    }
+
     private void selectItem(int position) {
         mCurrentSelectedPosition = position;
         if (mDrawerLayout != null) {
@@ -205,7 +239,7 @@ public class NavigationDrawerFragment extends Fragment implements NavigationDraw
         if (mCallbacks != null) {
             mCallbacks.onNavigationDrawerItemSelected(position);
         }
-        ((NavigationDrawerAdapter) mDrawerList.getAdapter()).selectPosition(position);
+        //((NavigationDrawerAdapter) mDrawerList.getAdapter()).selectPosition(position);
     }
 
     public void openDrawer() {

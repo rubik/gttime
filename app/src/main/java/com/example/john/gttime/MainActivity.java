@@ -39,10 +39,11 @@ public class MainActivity extends ActionBarActivity
     private RequestQueue mRequestQueue;
     private EditText mStopEdit;
     private TextView mResultNoStop;
-    private TextView mStopName;
+    private CheckedTextView mStopName;
     private ProgressBarCircularIndeterminate mProgressCircle;
     private RelativeLayout mResults;
 
+    private String mStopNumber = null;
     private ArrayList<StopResult> mDataset;
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -63,7 +64,7 @@ public class MainActivity extends ActionBarActivity
 
         mStopEdit = (EditText) findViewById(R.id.stop_edit);
         mResultNoStop = (TextView) findViewById(R.id.result_no_stop);
-        mStopName = (TextView) findViewById(R.id.results_stop_name);
+        mStopName = (CheckedTextView) findViewById(R.id.results_stop_name);
         mProgressCircle = (ProgressBarCircularIndeterminate) findViewById(R.id.progress_circle);
         mResults = (RelativeLayout) findViewById(R.id.results);
 
@@ -84,8 +85,9 @@ public class MainActivity extends ActionBarActivity
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
-        // update the main content by replacing fragments
-        Toast.makeText(this, "Menu item selected -> " + position, Toast.LENGTH_SHORT).show();
+        String mStopNumber = new ArrayList<>(mNavigationDrawerFragment.getStarred()).get(position);
+        mStopEdit.setText(mStopNumber);
+        refreshData();
     }
 
 
@@ -101,10 +103,11 @@ public class MainActivity extends ActionBarActivity
         CheckedTextView star = (CheckedTextView) v;
         star.toggle();
         if (star.isChecked()) {
-            Toast.makeText(getApplicationContext(), "Adding stop to starred", Toast.LENGTH_SHORT).show();
+            mNavigationDrawerFragment.addToFavorites(mStopNumber);
         } else {
-            Toast.makeText(getApplicationContext(), "Removing stop to starred", Toast.LENGTH_SHORT).show();
+            mNavigationDrawerFragment.removeFromFavorites(mStopNumber);
         }
+        mNavigationDrawerFragment.datasetChanged();
     }
 
     public void refreshDataFromView(View v) {
@@ -117,8 +120,8 @@ public class MainActivity extends ActionBarActivity
             Toast.makeText(getApplicationContext(), R.string.toast_no_conn, Toast.LENGTH_SHORT).show();
             return;
         }
-        String stopNumber = mStopEdit.getText().toString();
-        if (stopNumber.isEmpty()) {
+        mStopNumber = mStopEdit.getText().toString();
+        if (mStopNumber.isEmpty()) {
             Toast.makeText(getApplicationContext(), R.string.toast_no_stop, Toast.LENGTH_SHORT).show();
             return;
         }
@@ -130,7 +133,7 @@ public class MainActivity extends ActionBarActivity
             mDataset.clear();
             mAdapter.notifyItemRangeRemoved(0, size);
         }
-        FiveT.getStopData(stopNumber, mRequestQueue, new FiveT.StopDataClientListener() {
+        FiveT.getStopData(mStopNumber, mRequestQueue, new FiveT.StopDataClientListener() {
             @Override
             public void onResponse(ApiResult result) {
                 mProgressCircle.setVisibility(View.GONE);
@@ -141,6 +144,7 @@ public class MainActivity extends ActionBarActivity
                 }
                 int i = 0;
                 mStopName.setText(result.getStopName());
+                mStopName.setChecked(mNavigationDrawerFragment.isFavorite(mStopNumber));
                 for (StopResult res : result.getStopResults()) {
                     mDataset.add(res);
                     mAdapter.notifyItemInserted(i++);
