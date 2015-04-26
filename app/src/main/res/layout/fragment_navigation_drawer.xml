@@ -24,7 +24,7 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:layout_marginTop="5dp"
         android:layout_marginStart="10dp"
-        android:visibility="gone" />
+        android:visibility="visible" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/drawer_list"
@@ -34,5 +34,5 @@
         android:layout_marginTop="10dp"
         android:clickable="true"
         android:scrollbars="vertical"
-        android:visibility="visible" />
+        android:visibility="gone" />
 </RelativeLayout>

@@ -14,8 +14,6 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
 
     private List<NavigationItem> mData;
     private NavigationDrawerCallbacks mNavigationDrawerCallbacks;
-    private View mSelectedView;
-    private int mSelectedPosition;
 
     public NavigationDrawerAdapter(List<NavigationItem> data) {
         mData = data;
@@ -37,12 +35,6 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (mSelectedView != null) {
-                        mSelectedView.setSelected(false);
-                    }
-                    mSelectedPosition = viewHolder.getAdapterPosition();
-                    v.setSelected(true);
-                    mSelectedView = v;
                     if (mNavigationDrawerCallbacks != null) {
                         mNavigationDrawerCallbacks.onNavigationDrawerItemSelected(viewHolder.getAdapterPosition());
                     }
@@ -57,19 +49,6 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
     public void onBindViewHolder(NavigationDrawerAdapter.ViewHolder viewHolder, int i) {
         viewHolder.textView.setText(mData.get(i).getText());
         viewHolder.textView.setCompoundDrawablesWithIntrinsicBounds(mData.get(i).getDrawable(), null, null, null);
-        if (mSelectedPosition == i) {
-            if (mSelectedView != null) {
-                mSelectedView.setSelected(false);
-            }
-            mSelectedPosition = i;
-            mSelectedView = viewHolder.itemView;
-            mSelectedView.setSelected(true);
-        }
-    }
-
-    public void selectPosition(int position) {
-        mSelectedPosition = position;
-        notifyItemChanged(position);
     }
 
     @Override

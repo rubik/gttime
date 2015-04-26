@@ -11,6 +11,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,11 +34,6 @@ public class NavigationDrawerFragment extends Fragment implements NavigationDraw
      * All the starred stops.
      */
     public static final String KEY_STARRED_STOPS = "key_starred_stop";
-
-    /**
-     * Remember the position of the selected item.
-     */
-    private static final String STATE_SELECTED_POSITION = "selected_navigation_drawer_position";
 
     /**
      * Per the design guidelines, you should show the drawer on launch until the user manually
@@ -63,7 +59,6 @@ public class NavigationDrawerFragment extends Fragment implements NavigationDraw
     private View mFragmentContainerView;
     private TextView mTextNoStarred;
 
-    private int mCurrentSelectedPosition = 0;
     private boolean mFromSavedInstanceState;
     private boolean mUserLearnedDrawer;
     private TreeSet<String> mStarred = new TreeSet<>(new Comparator<String>() {
@@ -86,10 +81,8 @@ public class NavigationDrawerFragment extends Fragment implements NavigationDraw
         mUserLearnedDrawer = sp.getBoolean(PREF_USER_LEARNED_DRAWER, false);
 
         if (savedInstanceState != null) {
-            mCurrentSelectedPosition = savedInstanceState.getInt(STATE_SELECTED_POSITION);
             mFromSavedInstanceState = true;
         }
-
         mStarred.addAll(getStarredFromPrefs());
     }
 
@@ -175,12 +168,13 @@ public class NavigationDrawerFragment extends Fragment implements NavigationDraw
     public void datasetChanged() {
         getMenu();
         if (mNavigationItems.isEmpty()) {
+            Log.i("Gttime", "No starred, showing text " + mTextNoStarred.getText());
             mDrawerList.setVisibility(View.GONE);
             mTextNoStarred.setVisibility(View.VISIBLE);
         }
         mTextNoStarred.setVisibility(View.GONE);
+        mDrawerList.setVisibility(View.VISIBLE);
         mNavigationDrawerAdapter.notifyDataSetChanged();
-        //selectItem(mCurrentSelectedPosition);
     }
 
     public boolean isDrawerOpen() {
@@ -197,7 +191,12 @@ public class NavigationDrawerFragment extends Fragment implements NavigationDraw
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
-        selectItem(position);
+        if (mDrawerLayout != null) {
+            mDrawerLayout.closeDrawer(mFragmentContainerView);
+        }
+        if (mCallbacks != null) {
+            mCallbacks.onNavigationDrawerItemSelected(position);
+        }
     }
 
     public void getMenu() {
@@ -231,17 +230,6 @@ public class NavigationDrawerFragment extends Fragment implements NavigationDraw
         return mStarred.contains(stopNumber);
     }
 
-    private void selectItem(int position) {
-        mCurrentSelectedPosition = position;
-        if (mDrawerLayout != null) {
-            mDrawerLayout.closeDrawer(mFragmentContainerView);
-        }
-        if (mCallbacks != null) {
-            mCallbacks.onNavigationDrawerItemSelected(position);
-        }
-        //((NavigationDrawerAdapter) mDrawerList.getAdapter()).selectPosition(position);
-    }
-
     public void openDrawer() {
         mDrawerLayout.openDrawer(mFragmentContainerView);
     }
@@ -269,7 +257,6 @@ public class NavigationDrawerFragment extends Fragment implements NavigationDraw
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(STATE_SELECTED_POSITION, mCurrentSelectedPosition);
     }
 
     @Override
